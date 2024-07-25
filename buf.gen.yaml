@@ -1,0 +1,29 @@
+version: v2
+managed:
+  enabled: true
+  disable:
+    - module: buf.build/googleapis/googleapis
+      file_option: go_package_prefix
+    - module: buf.build/bufbuild/protovalidate
+      file_option: go_package_prefix
+  override:
+    - file_option: go_package_prefix
+      value: github.com/nhtuan0700/go-grpc-template/internal/generated
+
+plugins:
+  - remote: buf.build/grpc/go:v1.4.0
+    out: internal/generated
+    opt: paths=source_relative
+  # dependencies
+  - remote: buf.build/protocolbuffers/go
+    out: internal/generated
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway:v2.20.0
+    out: internal/generated/
+    opt: 
+      - paths=source_relative
+      - generate_unbound_methods=true
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.20.0
+    out: .
+    opt: 
+      - generate_unbound_methods=true

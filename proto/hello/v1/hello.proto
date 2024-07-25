@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package hello.v1;
+
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+
+service GreeterService {
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse) {
+    option (google.api.http) = {
+      post: "/v1/hello"
+      body: "*"
+    };
+  }
+}
+
+message SayHelloRequest {
+  string name = 1 [(buf.validate.field).required = true];
+}
+
+message SayHelloResponse {
+  string message = 1;
+}
