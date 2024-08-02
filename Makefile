@@ -11,4 +11,10 @@ start:
 	go run ./cmd/*.go start
 
 debug:
-	/go/bin/dlv --listen=:4000 --headless=true --log=true --accept-multiclient --api-version=2 exec ./cmd/*.go start
+	CGO_ENABLED=0 go build -gcflags "all=-N -l" -buildvcs=false -o hello-debug ./cmd
+	dlv --listen=:4000 --headless=true --api-version=2 exec ./hello-debug start
+
+.PHONY: cert
+cert:
+	cd cert && ./gen.sh
+

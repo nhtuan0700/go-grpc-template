@@ -10,6 +10,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
 	github.com/spf13/cobra v1.8.1
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.24.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2

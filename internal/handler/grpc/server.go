@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"crypto/tls"
 	"net"
 
 	"github.com/nhtuan0700/go-grpc-template/internal/config"
@@ -12,6 +13,7 @@ import (
 	"github.com/bufbuild/protovalidate-go"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type Server interface {
@@ -49,7 +51,13 @@ func (s server) Start(ctx context.Context) error {
 		return err
 	}
 
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		return err
+	}
+
 	server := grpc.NewServer(
+		grpc.Creds(tlsCredentials),
 		grpc.UnaryInterceptor(protovalidate_middleware.UnaryServerInterceptor(validator)),
 	)
 
@@ -57,4 +65,20 @@ func (s server) Start(ctx context.Context) error {
 
 	logger.Info("Starting grpc server: " + s.grpcConfig.Address)
 	return server.Serve(listener)
+}
+
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	// Load server's certificate and private key
+	serverCert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the credentials and return it
+	config := &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		ClientAuth:   tls.NoClientCert,
+	}
+
+	return credentials.NewTLS(config), nil
 }
