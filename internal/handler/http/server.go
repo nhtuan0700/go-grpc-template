@@ -2,11 +2,14 @@ package http
 
 import (
 	"context"
-	hellov1 "github.com/nhtuan0700/go-grpc-template/internal/generated/proto/hello/v1"
-	"github.com/nhtuan0700/go-grpc-template/internal/handler/http/middleware"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/nhtuan0700/go-grpc-template/internal/config"
+	hellov1 "github.com/nhtuan0700/go-grpc-template/internal/generated/proto/hello/v1"
+	// "github.com/nhtuan0700/go-grpc-template/internal/handler/http/middleware"
+	// "github.com/nhtuan0700/go-grpc-template/internal/utils"
+	"go.uber.org/zap"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -18,10 +21,21 @@ type Server interface {
 }
 
 type server struct {
+	httpConfig config.HTTP
+	grpcConfig config.GRPC
+	logger     *zap.Logger
 }
 
-func NewServer() Server {
-	return server{}
+func NewServer(
+	httpConfig config.HTTP,
+	grpcConfig config.GRPC,
+	logger *zap.Logger,
+) Server {
+	return server{
+		httpConfig: httpConfig,
+		grpcConfig: grpcConfig,
+		logger:     logger,
+	}
 }
 
 func (s server) setGRPCGatewayHandler(ctx context.Context) (http.Handler, error) {
@@ -32,7 +46,7 @@ func (s server) setGRPCGatewayHandler(ctx context.Context) (http.Handler, error)
 	err := hellov1.RegisterGreeterServiceHandlerFromEndpoint(
 		ctx,
 		grpcMux,
-		"127.0.0.1:8081",
+		s.grpcConfig.Address,
 		opts,
 	)
 	if err != nil {
@@ -48,14 +62,20 @@ func (s server) Start(ctx context.Context) error {
 		return err
 	}
 
-	handler := middleware.ExampleMiddleware(middleware.CorsMiddleware(grpcGatewayHandler))
+	// middlewares := []utils.Middleware{
+	// 	middleware.ExampleMiddleware,
+	// 	middleware.CorsMiddleware,
+	// 	middleware.RequestMiddlewareWith(ctx),
+	// }
+
+	// _ = utils.AddChainingMiddleware(grpcGatewayHandler, middlewares...)
 
 	httpServer := http.Server{
-		Addr:        "0.0.0.0:8080",
-		Handler:     handler,
+		Addr:        s.httpConfig.Address,
+		Handler:     grpcGatewayHandler,
 		ReadTimeout: time.Minute,
 	}
 
-	log.Println("Starting http server")
+	s.logger.Info("Starting http server: " + s.httpConfig.Address)
 	return httpServer.ListenAndServe()
 }
