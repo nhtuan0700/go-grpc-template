@@ -16,6 +16,7 @@ func NewHandler() hellov1.GreeterServiceServer {
 
 func (h Handler) SayHello(ctx context.Context, req *hellov1.SayHelloRequest) (*hellov1.SayHelloResponse, error) {
 	greeter := fmt.Sprintf("Hello %s", req.Name)
+
 	return &hellov1.SayHelloResponse{
 		Message: greeter,
 	}, nil

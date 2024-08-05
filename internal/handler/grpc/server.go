@@ -2,9 +2,12 @@ package grpc
 
 import (
 	"context"
-	hellov1 "github.com/nhtuan0700/go-grpc-template/internal/generated/proto/hello/v1"
-	"log"
 	"net"
+
+	"github.com/nhtuan0700/go-grpc-template/internal/config"
+	hellov1 "github.com/nhtuan0700/go-grpc-template/internal/generated/proto/hello/v1"
+	"github.com/nhtuan0700/go-grpc-template/internal/utils"
+	"go.uber.org/zap"
 
 	"github.com/bufbuild/protovalidate-go"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
@@ -16,19 +19,26 @@ type Server interface {
 }
 
 type server struct {
-	handler hellov1.GreeterServiceServer
+	handler    hellov1.GreeterServiceServer
+	grpcConfig config.GRPC
+	logger     *zap.Logger
 }
 
 func NewServer(
 	handler hellov1.GreeterServiceServer,
+	grpcConfig config.GRPC,
+	logger *zap.Logger,
 ) Server {
 	return &server{
-		handler: handler,
+		handler:    handler,
+		grpcConfig: grpcConfig,
+		logger:     logger,
 	}
 }
 
 func (s server) Start(ctx context.Context) error {
-	listener, err := net.Listen("tcp", "127.0.0.1:8081")
+	logger := utils.LoggerWithContext(ctx, s.logger)
+	listener, err := net.Listen("tcp", s.grpcConfig.Address)
 	if err != nil {
 		return err
 	}
@@ -44,6 +54,7 @@ func (s server) Start(ctx context.Context) error {
 	)
 
 	hellov1.RegisterGreeterServiceServer(server, s.handler)
-	log.Println("Starting grpc server")
+
+	logger.Info("Starting grpc server: " + s.grpcConfig.Address)
 	return server.Serve(listener)
 }

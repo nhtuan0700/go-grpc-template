@@ -8,7 +8,7 @@ import "buf/validate/validate.proto";
 service GreeterService {
   rpc SayHello(SayHelloRequest) returns (SayHelloResponse) {
     option (google.api.http) = {
-      post: "/v1/hello"
+      post: "api/v1/hello"
       body: "*"
     };
   }

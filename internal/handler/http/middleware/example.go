@@ -13,7 +13,7 @@ func ExampleMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Our middleware logic goes here...
 		data, err := io.ReadAll(r.Body)
-		if err == nil {
+		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{"message": "internal server error"})
 			return

@@ -19,5 +19,6 @@ ARG gid=1000
 RUN groupadd -g ${gid} ${group}
 RUN useradd -u ${uid} -g ${group} -s /bin/sh -m ${user} 
 # USER ${uid}:${gid}
+# RUN CGO_ENABLED=0 go install -ldflags "-s -w -extldflags '-static'" github.com/go-delve/delve/cmd/dlv@latest
 
 CMD ["bash"]
