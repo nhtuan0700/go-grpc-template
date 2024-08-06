@@ -14,16 +14,21 @@ type Server struct {
 	httpServer http.Server
 }
 
-func InitializeStandaloneServer(config config.Config) (*Server, func(), error) {
-	logger, loggerCleanup, err := utils.InitializeLogger(config.Log)
+func InitializeStandaloneServer() (*Server, func(), error) {
+	cfg, err := config.NewConfig()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	logger, loggerCleanup, err := utils.InitializeLogger(cfg.Log)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	grpcHandler := grpc.NewHandler()
-	grpcServer := grpc.NewServer(grpcHandler, config.GRPC, logger)
+	grpcServer := grpc.NewServer(grpcHandler, cfg.GRPC, logger)
 
-	httpServer := http.NewServer(config.HTTP, config.GRPC, logger)
+	httpServer := http.NewServer(cfg.HTTP, cfg.GRPC, logger)
 
 	cleanup := func ()  {
 		loggerCleanup()

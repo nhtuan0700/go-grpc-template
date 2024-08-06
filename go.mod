@@ -5,9 +5,11 @@ go 1.22.4
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240717164558-a6c49f84cc0f.2
 	github.com/bufbuild/protovalidate-go v0.6.3
+	github.com/caarlos0/env/v11 v11.2.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
+	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.8.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240723171418-e6d459c13d2a

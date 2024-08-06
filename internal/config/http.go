@@ -1,5 +1,5 @@
 package config
 
 type HTTP struct {
-	Address string
+	Address string `env:"SERVER_HTTP_ADDR"`
 }

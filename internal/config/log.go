@@ -1,6 +1,5 @@
 package config
 
 type Log struct {
-	Level string
-	Daily bool
+	Level string `env:"LOG_LEVEL"`
 }
